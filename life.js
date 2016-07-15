@@ -6,24 +6,37 @@
 var width = 80;
 var height = 25;
 var delay = 100; // ms
-document.body.style = "font-family: monospace; line-height: 50%;";
+
+// overrides
+var qs = window.location.search.slice(1).split('&');
+for (var i in qs) {
+  var param = qs[i].split('=');
+  if (param.length == 2) {
+    var key = param[0];
+    var value = param[1];
+    if (key == 'width') width = parseInt(value);
+    else if (key == 'height') height = parseInt(value);
+    else if (key == 'delay') delay = parseInt(value);
+  }
+}
 
 // run
 game(width, height, delay);
 
 // the game
-function game(width, height, delay) {
+function game(width, height, delay, id) {
+	var element = document.getElementById(id) || document.body;
+  element.style = "font-family: monospace; line-height: 50%; text-align: center;";
   var turns = 0;
   var board = init(width, height);
-  print(board);
+  print(element, board, turns);
   var game = setInterval(function() {
     board = step(board);
     if (!board) {
       clearInterval(game);
     } else {
       turns++;
-      print(board);
-      document.body.innerHTML += "<div style=\"text-align: center; font-size: 2em; line-height: 100%;\">" + turns + "</div>";
+      print(element, board, turns);
     }
   }, delay);
 }
@@ -86,14 +99,15 @@ function step(board) {
 }
 
 // print the board
-function print(board) {
-  document.body.innerHTML = "<pre>";
+function print(el, board, turns) {
+  el.innerHTML = "<pre>";
   for (var y = 0; y < board.length; y++) {
     var line = "";
     for (var x = 0; x < board[y].length; x++) {
       line += (board[y][x] == 1 ? "*" : "&nbsp;");
     }
-    document.body.innerHTML += line + "<br>";
+    el.innerHTML += line + "<br>";
   }
-  document.body.innerHTML += "</pre>";
+  el.innerHTML += "</pre>";
+  //el.innerHTML += "<div style=\"text-align: center; font-size: 2em; line-height: 100%;\">" + turns + "</div>";
 }
